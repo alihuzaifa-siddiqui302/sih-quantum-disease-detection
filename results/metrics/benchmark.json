@@ -1,0 +1,191 @@
+{
+  "metadata": {
+    "project": "SIH26139",
+    "description": "Quantum vs Classical benchmark on disease detection datasets"
+  },
+  "tabular": {
+    "heart": {
+      "qsvc_noiseless": {
+        "accuracy": 0.543478,
+        "precision": 0.116279,
+        "recall": 0.2,
+        "specificity": 0.81341,
+        "f1": 0.147059,
+        "f2": 0.174825,
+        "roc_auc": null,
+        "pr_auc": null,
+        "mcc": 0.093952
+      },
+      "lr": {
+        "accuracy": 0.586957,
+        "precision": 0.265287,
+        "recall": 0.308444,
+        "specificity": 0.877333,
+        "f1": 0.277037,
+        "f2": 0.29258,
+        "roc_auc": 0.833849,
+        "pr_auc": 0.43712,
+        "mcc": 0.328442
+      },
+      "svm_rbf": {
+        "accuracy": 0.608696,
+        "precision": 0.24,
+        "recall": 0.280889,
+        "specificity": 0.881489,
+        "f1": 0.258756,
+        "f2": 0.271572,
+        "roc_auc": 0.823047,
+        "pr_auc": 0.449982,
+        "mcc": 0.344399
+      },
+      "rf": {
+        "accuracy": 0.565217,
+        "precision": 0.298201,
+        "recall": 0.300444,
+        "specificity": 0.877433,
+        "f1": 0.295897,
+        "f2": 0.297884,
+        "roc_auc": 0.780276,
+        "pr_auc": 0.332954,
+        "mcc": 0.307893
+      },
+      "xgb": {
+        "accuracy": 0.608696,
+        "precision": 0.332184,
+        "recall": 0.316444,
+        "specificity": 0.888244,
+        "f1": 0.312044,
+        "f2": 0.31297,
+        "roc_auc": 0.776679,
+        "pr_auc": 0.348707,
+        "mcc": 0.366675
+      },
+      "mcnemar": {
+        "quantum_model": "qsvc_noiseless",
+        "classical_model": "xgb",
+        "chi2": 0.8,
+        "p_value": 0.371093,
+        "b": 1,
+        "c": 4,
+        "significant_at_05": false
+      }
+    },
+    "wbcd": {
+      "qsvc_noiseless": {
+        "accuracy": 0.604651,
+        "precision": 0.555398,
+        "recall": 0.545139,
+        "specificity": 0.545139,
+        "f1": 0.541117,
+        "f2": 0.541667,
+        "roc_auc": null,
+        "pr_auc": null,
+        "mcc": 0.100012
+      },
+      "lr": {
+        "accuracy": 0.860465,
+        "precision": 0.854167,
+        "recall": 0.844329,
+        "specificity": 0.844329,
+        "f1": 0.84868,
+        "f2": 0.845937,
+        "roc_auc": 0.965278,
+        "pr_auc": 0.97889,
+        "mcc": 0.698426
+      },
+      "svm_rbf": {
+        "accuracy": 0.906977,
+        "precision": 0.912562,
+        "recall": 0.887731,
+        "specificity": 0.887731,
+        "f1": 0.897619,
+        "f2": 0.891119,
+        "roc_auc": 0.986111,
+        "pr_auc": 0.992503,
+        "mcc": 0.799908
+      },
+      "rf": {
+        "accuracy": 0.860465,
+        "precision": 0.859606,
+        "recall": 0.837963,
+        "specificity": 0.837963,
+        "f1": 0.846429,
+        "f2": 0.84082,
+        "roc_auc": 0.971354,
+        "pr_auc": 0.984179,
+        "mcc": 0.697233
+      },
+      "xgb": {
+        "accuracy": 0.906977,
+        "precision": 0.912562,
+        "recall": 0.887731,
+        "specificity": 0.887731,
+        "f1": 0.897619,
+        "f2": 0.891119,
+        "roc_auc": 0.965856,
+        "pr_auc": 0.97878,
+        "mcc": 0.799908
+      },
+      "mcnemar": {
+        "quantum_model": "qsvc_noiseless",
+        "classical_model": "svm_rbf",
+        "chi2": 19.5312,
+        "p_value": 1e-05,
+        "b": 3,
+        "c": 29,
+        "significant_at_05": true
+      }
+    }
+  },
+  "imaging": {
+    "brain_mri": {
+      "qtl": {
+        "accuracy": 0.721875,
+        "precision": 0.725285,
+        "recall": 0.721875,
+        "specificity": 0.907292,
+        "f1": 0.678958,
+        "f2": 0.699667,
+        "roc_auc": null,
+        "pr_auc": null,
+        "mcc": 0.648726
+      }
+    }
+  },
+  "computational_efficiency": {
+    "qsvc_heart": {
+      "noiseless": {
+        "kernel_compute_s": 1111.49,
+        "svm_fit_s": 0.0067,
+        "total_fit_s": 1111.5,
+        "inference_latency_ms": 7841.586
+      },
+      "circuit_depth": 49,
+      "gate_count": 114,
+      "n_qubits": 6,
+      "n_quantum_params": 0,
+      "n_classical_params": "SVM dual (n_support_vectors)"
+    },
+    "qsvc_wbcd": {
+      "noiseless": {
+        "kernel_compute_s": 2287.65,
+        "svm_fit_s": 0.0171,
+        "total_fit_s": 2287.66,
+        "inference_latency_ms": 14482.97
+      },
+      "circuit_depth": 40,
+      "gate_count": 80,
+      "n_qubits": 5,
+      "n_quantum_params": 0,
+      "n_classical_params": "SVM dual (n_support_vectors)"
+    },
+    "qtl": {
+      "model": "qtl",
+      "total_train_time_s": 1497.0,
+      "n_classes": 4,
+      "test_f2": 0.6997,
+      "circuit_metrics_error": "'CircuitSpecs' object has no attribute 'get'",
+      "inference_latency_ms": 173.5
+    }
+  }
+}

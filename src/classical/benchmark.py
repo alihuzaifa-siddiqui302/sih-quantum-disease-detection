@@ -209,7 +209,7 @@ def _qsvc_efficiency(dataset: str) -> dict:
         jpath = METRICS_DIR / f"qsvc_{dataset}_{mode}.json"
         if not jpath.exists():
             continue
-        with open(jpath, encoding="utf-8") as f:
+        with open(jpath, encoding="utf-8-sig") as f:
             d = json.load(f)
         if d.get("status") not in ("complete", None):
             continue

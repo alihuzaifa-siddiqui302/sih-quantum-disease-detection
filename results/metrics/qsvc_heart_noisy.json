@@ -1,6 +1,6 @@
-﻿{
-    "mode":  "noisy",
-    "status":  "DNF",
-    "reason":  "AerSampler.from_backend API not available in qiskit-aer 0.17.2 (fixed, re-run separately)",
-    "dataset":  "heart"
+{
+  "dataset": "heart",
+  "mode": "noisy",
+  "status": "DNF",
+  "reason": "AerSampler.from_backend not available in qiskit-aer 0.17.2 (fixed in qsvc_engine.py; re-run with --modes noisy)"
 }
