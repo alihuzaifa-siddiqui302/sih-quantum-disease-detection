@@ -31,7 +31,7 @@ from pathlib import Path
 from typing import Literal
 
 import numpy as np
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, fbeta_score
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
@@ -59,6 +59,32 @@ def _load_split(dataset: str) -> dict[str, np.ndarray]:
     return {k: d[k] for k in ("X_train", "y_train", "X_val", "y_val", "X_test", "y_test")}
 
 
+def _check_kernel_diagonal(K_train: "np.ndarray", n_check: int = 10) -> float:
+    """
+    Standalone kernel diagonal sanity check.
+
+    For a correctly normalised fidelity kernel, K(x_i, x_i) must equal 1.0
+    (the inner product of a quantum state with itself is always 1).  Deviation
+    indicates a normalisation bug in the feature map or sampler.
+
+    Returns max_deviation from 1.0 across the checked samples.
+    Prints PASS / WARN result for audit.
+    """
+    n = min(n_check, K_train.shape[0])
+    diag = np.array([K_train[i, i] for i in range(n)])
+    max_dev = float(np.abs(diag - 1.0).max())
+    mean_val = float(diag.mean())
+
+    status = "PASS" if max_dev < 0.05 else "WARN — possible normalisation bug"
+    print(f"  [Kernel diagonal check]  n_checked={n}")
+    print(f"    K(x,x) values: {diag.round(4).tolist()}")
+    print(f"    mean={mean_val:.4f}  max_deviation_from_1={max_dev:.6f}  [{status}]")
+    if max_dev >= 0.05:
+        print(f"    *** Diagonal deviation {max_dev:.4f} ≥ 0.05 — inspect ZZFeatureMap "
+              f"normalisation before trusting kernel results ***")
+    return max_dev
+
+
 def _val_c_sweep(
     K_train: "np.ndarray",
     y_train: "np.ndarray",
@@ -67,9 +93,16 @@ def _val_c_sweep(
     c_values: list[float] | None = None,
 ) -> tuple[float, dict]:
     """
-    Val-accuracy based C sweep on a precomputed kernel.
-    Fits SVC(kernel='precomputed', C=c) for each c, evaluates on val set.
-    Returns (best_C, {c_val: val_acc, ...}).
+    Val-F2-score based C sweep on a precomputed kernel.
+
+    Kernel matrices K_train and K_val are computed ONCE externally and reused
+    for every C — no quantum re-evaluation per C value.
+
+    Selection criterion: validation F2-score (beta=2, recall-weighted) to
+    match the clinical objective and the selection metric used for classical
+    baseline tuning in Priority 4.
+
+    Returns (best_C, {str(c): val_f2, ...}).
     """
     from sklearn.svm import SVC
 
@@ -78,18 +111,19 @@ def _val_c_sweep(
 
     results: dict[float, float] = {}
     best_c = c_values[0]
-    best_val_acc = -1.0
+    best_val_f2 = -1.0
     for c in c_values:
         svm = SVC(kernel="precomputed", C=c)
         svm.fit(K_train, y_train)
-        acc = float(accuracy_score(y_val, svm.predict(K_val)))
-        results[c] = round(acc, 4)
-        if acc > best_val_acc:
-            best_val_acc = acc
+        preds = svm.predict(K_val)
+        f2 = float(fbeta_score(y_val, preds, beta=2, average="binary", zero_division=0))
+        results[c] = round(f2, 4)
+        if f2 > best_val_f2:
+            best_val_f2 = f2
             best_c = c
 
-    print(f"  C sweep: " + "  ".join(f"C={c}: {results[c]:.3f}" for c in c_values))
-    print(f"  Best C={best_c}  (val_acc={best_val_acc:.4f})")
+    print(f"  C sweep (val F2):  " + "  ".join(f"C={c}: {results[c]:.3f}" for c in c_values))
+    print(f"  Best C={best_c}  (val_F2={best_val_f2:.4f})")
     return best_c, results
 
 
@@ -130,15 +164,12 @@ def _train_single(
     K_test  = qsvc.quantum_kernel.evaluate(X_test, X_train)    # (n_test,  n_train)
     kernel_compute_s = time.perf_counter() - t_kernel_start
 
-    # ── Kernel diagonal sanity check ───────────────────────────────────────
-    diag = np.diag(K_train[:10])
-    diag_dev = float(abs(diag - 1.0).max())
-    print(f"  Kernel diagonal (first 10): min={diag.min():.4f}  max={diag.max():.4f}  "
-          f"max_deviation_from_1={diag_dev:.4f}")
+    # ── Kernel diagonal sanity check (standalone, before C sweep) ────────
+    diag_dev = _check_kernel_diagonal(K_train)
 
-    # ── Step 2: val-based C sweep on precomputed kernel ───────────────────
-    print(f"  Running C sweep on validation set...")
-    best_c, val_acc_by_c = _val_c_sweep(K_train, y_train, K_val, y_val)
+    # ── Step 2: val-F2 based C sweep on precomputed kernel ────────────────
+    print(f"  Running C sweep (selection by val F2-score, beta=2)...")
+    best_c, val_f2_by_c = _val_c_sweep(K_train, y_train, K_val, y_val)
 
     # ── Step 3: final SVM fit with best C (timed separately) ─────────────
     t_svm_start = time.perf_counter()
@@ -173,6 +204,27 @@ def _train_single(
     joblib.dump({"svm": final_svm, "qsvc": qsvc, "best_C": best_c},
                 CHECKPOINT_DIR / f"qsvc_{dataset}_{mode}.pkl")
 
+    # ── Kernel concentration diagnostic (WBCD-specific, NISQ failure mode) ─
+    test_acc = test_res["accuracy"]
+    concentration_note = None
+    if dataset == "wbcd" and test_acc < 0.80:
+        # Compute off-diagonal kernel statistics to diagnose concentration
+        off_diag_vals = K_train[np.triu_indices(K_train.shape[0], k=1)]
+        off_diag_mean = float(off_diag_vals.mean())
+        off_diag_std  = float(off_diag_vals.std())
+        concentration_note = (
+            f"WBCD test accuracy {test_acc:.1%} < 80% target after C-sweep. "
+            f"Off-diagonal kernel statistics: mean={off_diag_mean:.4f}, std={off_diag_std:.4f}. "
+            f"Low std (< 0.05) indicates quantum kernel concentration (exponential "
+            f"concentration / barren-plateau analogue in feature space) — a known "
+            f"NISQ failure mode where deeply entangling ZZFeatureMaps produce kernel "
+            f"matrices whose off-diagonal entries collapse toward a constant, removing "
+            f"discriminative information. Mitigation: reduce reps, use linear entanglement, "
+            f"or switch to data re-uploading PQC."
+        )
+        print(f"  [Kernel concentration] off-diag mean={off_diag_mean:.4f}  std={off_diag_std:.4f}")
+        print(f"  {concentration_note}")
+
     result = {
         "dataset": dataset,
         "mode": mode,
@@ -183,8 +235,9 @@ def _train_single(
         "n_val": int(len(y_val)),
         "n_test": int(len(y_test)),
         "best_C": best_c,
-        "val_acc_by_C": {str(k): v for k, v in val_acc_by_c.items()},
+        "val_f2_by_C": {str(k): v for k, v in val_f2_by_c.items()},
         "kernel_diagonal_max_dev": round(diag_dev, 6),
+        "kernel_concentration_note": concentration_note,
         "timing": {
             "total_fit_s": round(total_fit_s, 2),
             "kernel_compute_s": round(kernel_compute_s, 2),
