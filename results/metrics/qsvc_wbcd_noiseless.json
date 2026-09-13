@@ -1,0 +1,6 @@
+{
+  "dataset": "wbcd_subset50",
+  "mode": "noiseless",
+  "n_qubits": 5,
+  "test_accuracy": 0.55
+}

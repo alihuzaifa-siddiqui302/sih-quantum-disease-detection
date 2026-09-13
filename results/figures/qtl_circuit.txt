@@ -1,0 +1,34 @@
+Quantum Transfer Learning — PQC Diagram
+Device: lightning.qubit | Wires: 6 | diff_method: adjoint
+AngleEmbedding (Ry) + StronglyEntanglingLayers (3 layers)
+======================================================================
+0: ─╭AngleEmbedding(M0)─╭StronglyEntanglingLayers(M1)─┤  <Z>
+1: ─├AngleEmbedding(M0)─├StronglyEntanglingLayers(M1)─┤  <Z>
+2: ─├AngleEmbedding(M0)─├StronglyEntanglingLayers(M1)─┤  <Z>
+3: ─├AngleEmbedding(M0)─├StronglyEntanglingLayers(M1)─┤  <Z>
+4: ─├AngleEmbedding(M0)─├StronglyEntanglingLayers(M1)─┤     
+5: ─╰AngleEmbedding(M0)─╰StronglyEntanglingLayers(M1)─┤     
+
+M0 = 
+[0. 0. 0. 0. 0. 0.]
+M1 = 
+[[[0. 0. 0.]
+  [0. 0. 0.]
+  [0. 0. 0.]
+  [0. 0. 0.]
+  [0. 0. 0.]
+  [0. 0. 0.]]
+
+ [[0. 0. 0.]
+  [0. 0. 0.]
+  [0. 0. 0.]
+  [0. 0. 0.]
+  [0. 0. 0.]
+  [0. 0. 0.]]
+
+ [[0. 0. 0.]
+  [0. 0. 0.]
+  [0. 0. 0.]
+  [0. 0. 0.]
+  [0. 0. 0.]
+  [0. 0. 0.]]]
