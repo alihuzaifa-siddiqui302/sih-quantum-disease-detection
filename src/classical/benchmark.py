@@ -42,6 +42,7 @@ from sklearn.metrics import (
     average_precision_score,
     confusion_matrix,
     f1_score,
+    fbeta_score,
     matthews_corrcoef,
     precision_recall_curve,
     precision_score,
@@ -93,7 +94,7 @@ def _compute_specificity(y_true: np.ndarray, y_pred: np.ndarray, n_classes: int)
 
 
 def _f2_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-    return float(f1_score(y_true, y_pred, beta=2, average="macro", zero_division=0))
+    return float(fbeta_score(y_true, y_pred, beta=2, average="macro", zero_division=0))
 
 
 def _roc_auc(y_true: np.ndarray, y_pred_proba: np.ndarray | None, n_classes: int) -> float | None:

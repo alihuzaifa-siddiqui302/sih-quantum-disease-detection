@@ -44,7 +44,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from sklearn.metrics import f1_score, recall_score
+from sklearn.metrics import fbeta_score, recall_score
 from torch.utils.data import DataLoader, TensorDataset
 
 # ─── Paths ───────────────────────────────────────────────────────────────────
@@ -121,7 +121,7 @@ def _extract_and_cache_features(
 
 def _f2_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     """Macro F2-score (beta=2, weights recall twice as much as precision)."""
-    return float(f1_score(y_true, y_pred, beta=2, average="macro", zero_division=0))
+    return float(fbeta_score(y_true, y_pred, beta=2, average="macro", zero_division=0))
 
 
 def _macro_recall(y_true: np.ndarray, y_pred: np.ndarray) -> float:

@@ -32,7 +32,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torchvision.models as tv_models
-from sklearn.metrics import accuracy_score, classification_report, f1_score
+from sklearn.metrics import accuracy_score, classification_report, fbeta_score
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
@@ -90,7 +90,7 @@ class ClassicalResNet18(nn.Module):
 # ─── Helpers ─────────────────────────────────────────────────────────────────
 
 def _f2(y_true, y_pred) -> float:
-    return float(f1_score(y_true, y_pred, beta=2, average="macro", zero_division=0))
+    return float(fbeta_score(y_true, y_pred, beta=2, average="macro", zero_division=0))
 
 
 def _eval_model(model, loader, criterion, device="cpu") -> tuple[float, float, float]:
