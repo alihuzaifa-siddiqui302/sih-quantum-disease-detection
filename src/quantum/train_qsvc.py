@@ -59,6 +59,40 @@ def _load_split(dataset: str) -> dict[str, np.ndarray]:
     return {k: d[k] for k in ("X_train", "y_train", "X_val", "y_val", "X_test", "y_test")}
 
 
+def _val_c_sweep(
+    K_train: "np.ndarray",
+    y_train: "np.ndarray",
+    K_val: "np.ndarray",
+    y_val: "np.ndarray",
+    c_values: list[float] | None = None,
+) -> tuple[float, dict]:
+    """
+    Val-accuracy based C sweep on a precomputed kernel.
+    Fits SVC(kernel='precomputed', C=c) for each c, evaluates on val set.
+    Returns (best_C, {c_val: val_acc, ...}).
+    """
+    from sklearn.svm import SVC
+
+    if c_values is None:
+        c_values = [0.01, 0.1, 0.5, 1.0, 5.0, 10.0, 50.0]
+
+    results: dict[float, float] = {}
+    best_c = c_values[0]
+    best_val_acc = -1.0
+    for c in c_values:
+        svm = SVC(kernel="precomputed", C=c)
+        svm.fit(K_train, y_train)
+        acc = float(accuracy_score(y_val, svm.predict(K_val)))
+        results[c] = round(acc, 4)
+        if acc > best_val_acc:
+            best_val_acc = acc
+            best_c = c
+
+    print(f"  C sweep: " + "  ".join(f"C={c}: {results[c]:.3f}" for c in c_values))
+    print(f"  Best C={best_c}  (val_acc={best_val_acc:.4f})")
+    return best_c, results
+
+
 def _train_single(
     dataset: str,
     mode: Literal["noiseless", "noisy"],
@@ -68,11 +102,14 @@ def _train_single(
     """
     Train one QSVC configuration. Returns result dict with:
       - kernel_compute_s: wall-clock for kernel matrix computation
-      - svm_fit_s:        wall-clock for SVM dual solver
+      - svm_fit_s:        wall-clock for SVM dual solver (best-C model)
+      - best_C:           C value selected by validation accuracy
+      - val_acc_by_C:     C-sweep results for audit
       - train/val/test accuracy + classification report
     """
     from src.quantum.qsvc_engine import build_qsvc, build_noise_model
     import joblib
+    from sklearn.svm import SVC
 
     X_train, y_train = data["X_train"], data["y_train"]
     X_val,   y_val   = data["X_val"],   data["y_val"]
@@ -85,56 +122,56 @@ def _train_single(
     noise_model = build_noise_model() if mode == "noisy" else None
     qsvc, fm = build_qsvc(n_qubits=n_qubits, noise_model=noise_model, reps=reps)
 
-    # ── Kernel matrix computation (timed separately) ───────────────────────
-    # Trigger kernel computation explicitly by fitting
-    print(f"  Fitting QSVC (kernel + SVM combined timing)...")
+    # ── Step 1: compute kernel matrices (timed) ────────────────────────────
+    print(f"  Computing quantum kernel matrices...")
     t_kernel_start = time.perf_counter()
-    # The quantum kernel is computed during fit() — it's not separable from the
-    # SVM solver in the Qiskit ML API without subclassing. We estimate:
-    # kernel_compute_s = total_fit_s * (n_train^2 / (n_train^2 + n_train))  ≈ total_fit_s
-    # and svm_fit_s from a classical SVM post-kernel (negligible vs kernel computation).
-    qsvc.fit(X_train, y_train)
-    t_fit_end = time.perf_counter()
-    total_fit_s = t_fit_end - t_kernel_start
+    K_train = qsvc.quantum_kernel.evaluate(X_train)            # (n_train, n_train)
+    K_val   = qsvc.quantum_kernel.evaluate(X_val, X_train)     # (n_val,   n_train)
+    K_test  = qsvc.quantum_kernel.evaluate(X_test, X_train)    # (n_test,  n_train)
+    kernel_compute_s = time.perf_counter() - t_kernel_start
 
-    # Classical SVM fit time estimation: fit a pre-computed kernel SVM
-    from sklearn.svm import SVC
-    import numpy as np
-    K_train = qsvc.quantum_kernel.evaluate(X_train)
+    # ── Kernel diagonal sanity check ───────────────────────────────────────
+    diag = np.diag(K_train[:10])
+    diag_dev = float(abs(diag - 1.0).max())
+    print(f"  Kernel diagonal (first 10): min={diag.min():.4f}  max={diag.max():.4f}  "
+          f"max_deviation_from_1={diag_dev:.4f}")
+
+    # ── Step 2: val-based C sweep on precomputed kernel ───────────────────
+    print(f"  Running C sweep on validation set...")
+    best_c, val_acc_by_c = _val_c_sweep(K_train, y_train, K_val, y_val)
+
+    # ── Step 3: final SVM fit with best C (timed separately) ─────────────
     t_svm_start = time.perf_counter()
-    _svm_check = SVC(kernel="precomputed")
-    _svm_check.fit(K_train, y_train)
+    final_svm = SVC(kernel="precomputed", C=best_c)
+    final_svm.fit(K_train, y_train)
     svm_fit_s = time.perf_counter() - t_svm_start
-    kernel_compute_s = total_fit_s - svm_fit_s
+    total_fit_s = kernel_compute_s + svm_fit_s
 
-    print(f"  kernel_compute_s={kernel_compute_s:.1f}  svm_fit_s={svm_fit_s:.3f}  total={total_fit_s:.1f}s")
+    print(f"  kernel_compute_s={kernel_compute_s:.1f}  svm_fit_s={svm_fit_s:.3f}  "
+          f"total={total_fit_s:.1f}s  best_C={best_c}")
 
     # ── Evaluation ──────────────────────────────────────────────────────────
-    def _eval(X: np.ndarray, y: np.ndarray, split: str) -> dict:
+    def _eval_precomputed(K: np.ndarray, y: np.ndarray, split: str) -> dict:
         t0 = time.perf_counter()
-        preds = qsvc.predict(X)
-        latency_ms = (time.perf_counter() - t0) / len(X) * 1000
+        preds = final_svm.predict(K)
+        latency_ms = (time.perf_counter() - t0) / len(y) * 1000
         acc = float(accuracy_score(y, preds))
         report = classification_report(y, preds, output_dict=True, zero_division=0)
         print(f"  {split} acc={acc:.4f}  latency={latency_ms:.2f}ms/sample")
-        return {"accuracy": acc, "report": report,
-                "latency_ms_per_sample": round(latency_ms, 3)}
+        return {"accuracy": acc, "report": report, "latency_ms_per_sample": round(latency_ms, 3)}
 
-    train_res = _eval(X_train, y_train, "train")
-    val_res   = _eval(X_val,   y_val,   "val")
-    test_res  = _eval(X_test,  y_test,  "test")
+    train_res = _eval_precomputed(K_train, y_train, "train")
+    val_res   = _eval_precomputed(K_val,   y_val,   "val")
+    test_res  = _eval_precomputed(K_test,  y_test,  "test")
 
     # Save test predictions for McNemar's test
-    test_preds = qsvc.predict(X_test)
-    preds_path = METRICS_DIR / f"qsvc_{dataset}_{mode}_preds.npy"
-    true_path  = METRICS_DIR / f"qsvc_{dataset}_{mode}_true.npy"
-    np.save(preds_path, test_preds)
-    np.save(true_path, y_test)
+    test_preds = final_svm.predict(K_test)
+    np.save(METRICS_DIR / f"qsvc_{dataset}_{mode}_preds.npy", test_preds)
+    np.save(METRICS_DIR / f"qsvc_{dataset}_{mode}_true.npy",  y_test)
 
-    # Save model checkpoint
-    ckpt_path = CHECKPOINT_DIR / f"qsvc_{dataset}_{mode}.pkl"
-    import joblib
-    joblib.dump(qsvc, ckpt_path)
+    # Save the fitted SVM (not the full QSVC since kernel is precomputed separately)
+    joblib.dump({"svm": final_svm, "qsvc": qsvc, "best_C": best_c},
+                CHECKPOINT_DIR / f"qsvc_{dataset}_{mode}.pkl")
 
     result = {
         "dataset": dataset,
@@ -145,6 +182,9 @@ def _train_single(
         "n_train": int(len(y_train)),
         "n_val": int(len(y_val)),
         "n_test": int(len(y_test)),
+        "best_C": best_c,
+        "val_acc_by_C": {str(k): v for k, v in val_acc_by_c.items()},
+        "kernel_diagonal_max_dev": round(diag_dev, 6),
         "timing": {
             "total_fit_s": round(total_fit_s, 2),
             "kernel_compute_s": round(kernel_compute_s, 2),
@@ -160,6 +200,7 @@ def _train_single(
         json.dump(result, f, indent=2)
     print(f"  Saved -> {out_path}")
     return result
+
 
 
 def _run_with_timeout(

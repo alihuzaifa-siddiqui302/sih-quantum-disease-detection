@@ -48,3 +48,9 @@ build/
 # === Logs ===
 *.log
 logs/
+
+models/checkpoints/*.pkl
+results/metrics/*.npy
+results/metrics/*.json
+results/figures/*.png
+

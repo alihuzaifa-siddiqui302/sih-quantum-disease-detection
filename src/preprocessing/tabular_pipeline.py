@@ -65,12 +65,14 @@ DATASET_CFG = {
         "target_col": "target",
         "n_select": 12,     # ANOVA/MI candidates to shortlist
         "k_pca_max": 6,
+        "binarize": True,   # collapse 0-4 severity to 0 (no disease) vs 1 (disease)
     },
     "wbcd": {
         "csv": RAW_DIR / "wbcd.csv",
         "target_col": "target",
         "n_select": 12,
         "k_pca_max": 6,
+        "binarize": False,  # already binary (0=malignant, 1=benign)
     },
 }
 
@@ -84,6 +86,14 @@ def _load(cfg: dict) -> tuple[pd.DataFrame, np.ndarray]:
     df = pd.read_csv(cfg["csv"])
     target_col = cfg["target_col"]
     y = df[target_col].values.astype(int)
+
+    # Heart disease: binarize 0–4 severity → 0 (no disease) vs 1 (disease present)
+    if cfg.get("binarize", False):
+        y_before = np.unique(y).tolist()
+        y = (y > 0).astype(int)
+        print(f"  [BINARIZE] {target_col}: {y_before} → {{0: no-disease, 1: disease-present}}")
+        print(f"  Class counts after binarize: 0={int((y==0).sum())}  1={int((y==1).sum())}")
+
     X = df.drop(columns=[target_col])
     # Keep only numeric columns
     X = X.select_dtypes(include=[np.number])
