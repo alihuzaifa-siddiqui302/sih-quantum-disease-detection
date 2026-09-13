@@ -222,10 +222,10 @@ def build_qsvc(
         sampler = StatevectorSampler()
         label = "noiseless"
     else:
-        # Noisy: use AerSampler with noise model
+        # Noisy: use AerSampler with noise model via set_options (qiskit-aer 0.17.x API)
         from qiskit_aer.primitives import Sampler as AerSampler  # noqa: PLC0415
-        backend = AerSimulator(noise_model=noise_model)
-        sampler = AerSampler.from_backend(backend)
+        sampler = AerSampler()
+        sampler.set_options(noise_model=noise_model)
         label = "noisy"
 
     fidelity = ComputeUncompute(sampler=sampler)

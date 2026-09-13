@@ -1,0 +1,98 @@
+{
+  "model": "xgb",
+  "dataset": "wbcd",
+  "fit_time_s": 0.8739,
+  "train": {
+    "accuracy": 1.0,
+    "report": {
+      "0": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 148.0
+      },
+      "1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 250.0
+      },
+      "accuracy": 1.0,
+      "macro avg": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 398.0
+      },
+      "weighted avg": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 398.0
+      }
+    },
+    "latency_ms_per_sample": 0.014
+  },
+  "val": {
+    "accuracy": 0.9647058823529412,
+    "report": {
+      "0": {
+        "precision": 0.9393939393939394,
+        "recall": 0.96875,
+        "f1-score": 0.9538461538461539,
+        "support": 32.0
+      },
+      "1": {
+        "precision": 0.9807692307692307,
+        "recall": 0.9622641509433962,
+        "f1-score": 0.9714285714285714,
+        "support": 53.0
+      },
+      "accuracy": 0.9647058823529412,
+      "macro avg": {
+        "precision": 0.9600815850815851,
+        "recall": 0.9655070754716981,
+        "f1-score": 0.9626373626373627,
+        "support": 85.0
+      },
+      "weighted avg": {
+        "precision": 0.9651926504867681,
+        "recall": 0.9647058823529412,
+        "f1-score": 0.9648093083387201,
+        "support": 85.0
+      }
+    },
+    "latency_ms_per_sample": 0.0334
+  },
+  "test": {
+    "accuracy": 0.9069767441860465,
+    "report": {
+      "0": {
+        "precision": 0.9285714285714286,
+        "recall": 0.8125,
+        "f1-score": 0.8666666666666667,
+        "support": 32.0
+      },
+      "1": {
+        "precision": 0.896551724137931,
+        "recall": 0.9629629629629629,
+        "f1-score": 0.9285714285714286,
+        "support": 54.0
+      },
+      "accuracy": 0.9069767441860465,
+      "macro avg": {
+        "precision": 0.9125615763546798,
+        "recall": 0.8877314814814814,
+        "f1-score": 0.8976190476190476,
+        "support": 86.0
+      },
+      "weighted avg": {
+        "precision": 0.9084660327643488,
+        "recall": 0.9069767441860465,
+        "f1-score": 0.9055370985603545,
+        "support": 86.0
+      }
+    },
+    "latency_ms_per_sample": 0.0279
+  }
+}

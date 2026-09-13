@@ -1,0 +1,6 @@
+{
+  "model": "qtl",
+  "total_train_time_s": 1497.0,
+  "n_classes": 4,
+  "test_f2": 0.6997
+}
