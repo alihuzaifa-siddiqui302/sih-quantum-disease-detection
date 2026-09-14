@@ -1,0 +1,6 @@
+{
+  "dataset": "wbcd",
+  "mode": "noisy",
+  "status": "DNF",
+  "reason": "Exceeded timeout of 40 min on CPU (Aer noisy simulation with 79,003 pairwise quantum circuits exceeds NISQ single-node budget)"
+}

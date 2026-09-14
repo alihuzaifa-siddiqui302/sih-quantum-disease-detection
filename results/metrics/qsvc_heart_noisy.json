@@ -1,6 +1,120 @@
 {
   "dataset": "heart",
   "mode": "noisy",
-  "status": "DNF",
-  "reason": "AerSampler.from_backend not available in qiskit-aer 0.17.2 (fixed in qsvc_engine.py; re-run with --modes noisy)"
+  "status": "complete",
+  "n_qubits": 6,
+  "reps": 2,
+  "n_train": 212,
+  "n_val": 45,
+  "n_test": 46,
+  "best_C": 5.0,
+  "val_f2_by_C": {
+    "0.01": 0.0,
+    "0.1": 0.0,
+    "0.5": 0.0,
+    "1.0": 0.3226,
+    "5.0": 0.4639,
+    "10.0": 0.4592,
+    "50.0": 0.4592
+  },
+  "kernel_diagonal_max_dev": 0.0,
+  "kernel_concentration_note": null,
+  "timing": {
+    "total_fit_s": 20764.4,
+    "kernel_compute_s": 20764.39,
+    "svm_fit_s": 0.0093
+  },
+  "train": {
+    "accuracy": 1.0,
+    "report": {
+      "0": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 115.0
+      },
+      "1": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 97.0
+      },
+      "accuracy": 1.0,
+      "macro avg": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 212.0
+      },
+      "weighted avg": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 212.0
+      }
+    },
+    "latency_ms_per_sample": 0.01
+  },
+  "val": {
+    "accuracy": 0.6444444444444445,
+    "report": {
+      "0": {
+        "precision": 0.625,
+        "recall": 0.8333333333333334,
+        "f1-score": 0.7142857142857143,
+        "support": 24.0
+      },
+      "1": {
+        "precision": 0.6923076923076923,
+        "recall": 0.42857142857142855,
+        "f1-score": 0.5294117647058824,
+        "support": 21.0
+      },
+      "accuracy": 0.6444444444444445,
+      "macro avg": {
+        "precision": 0.6586538461538461,
+        "recall": 0.6309523809523809,
+        "f1-score": 0.6218487394957983,
+        "support": 45.0
+      },
+      "weighted avg": {
+        "precision": 0.6564102564102564,
+        "recall": 0.6444444444444445,
+        "f1-score": 0.6280112044817927,
+        "support": 45.0
+      }
+    },
+    "latency_ms_per_sample": 0.028
+  },
+  "test": {
+    "accuracy": 0.6521739130434783,
+    "report": {
+      "0": {
+        "precision": 0.6216216216216216,
+        "recall": 0.92,
+        "f1-score": 0.7419354838709677,
+        "support": 25.0
+      },
+      "1": {
+        "precision": 0.7777777777777778,
+        "recall": 0.3333333333333333,
+        "f1-score": 0.4666666666666667,
+        "support": 21.0
+      },
+      "accuracy": 0.6521739130434783,
+      "macro avg": {
+        "precision": 0.6996996996996997,
+        "recall": 0.6266666666666667,
+        "f1-score": 0.6043010752688172,
+        "support": 46.0
+      },
+      "weighted avg": {
+        "precision": 0.6929103016059538,
+        "recall": 0.6521739130434783,
+        "f1-score": 0.6162692847124824,
+        "support": 46.0
+      }
+    },
+    "latency_ms_per_sample": 0.032
+  }
 }

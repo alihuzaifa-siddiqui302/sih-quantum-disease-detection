@@ -1,98 +1,103 @@
 {
   "model": "xgb",
   "dataset": "wbcd",
-  "fit_time_s": 0.8739,
+  "fit_time_s": 18.9722,
+  "best_params": {
+    "learning_rate": 0.01,
+    "max_depth": 6,
+    "n_estimators": 100
+  },
   "train": {
-    "accuracy": 1.0,
+    "accuracy": 0.9698492462311558,
     "report": {
       "0": {
-        "precision": 1.0,
-        "recall": 1.0,
-        "f1-score": 1.0,
+        "precision": 0.9857142857142858,
+        "recall": 0.9324324324324325,
+        "f1-score": 0.9583333333333334,
         "support": 148.0
       },
       "1": {
-        "precision": 1.0,
-        "recall": 1.0,
-        "f1-score": 1.0,
+        "precision": 0.9612403100775194,
+        "recall": 0.992,
+        "f1-score": 0.9763779527559056,
         "support": 250.0
       },
-      "accuracy": 1.0,
+      "accuracy": 0.9698492462311558,
       "macro avg": {
-        "precision": 1.0,
-        "recall": 1.0,
-        "f1-score": 1.0,
+        "precision": 0.9734772978959025,
+        "recall": 0.9622162162162162,
+        "f1-score": 0.9673556430446195,
         "support": 398.0
       },
       "weighted avg": {
-        "precision": 1.0,
-        "recall": 1.0,
-        "f1-score": 1.0,
+        "precision": 0.970341185439935,
+        "recall": 0.9698492462311558,
+        "f1-score": 0.969667893272135,
         "support": 398.0
       }
     },
-    "latency_ms_per_sample": 0.014
+    "latency_ms_per_sample": 0.0099
   },
   "val": {
-    "accuracy": 0.9647058823529412,
+    "accuracy": 0.9764705882352941,
     "report": {
       "0": {
-        "precision": 0.9393939393939394,
-        "recall": 0.96875,
-        "f1-score": 0.9538461538461539,
+        "precision": 1.0,
+        "recall": 0.9375,
+        "f1-score": 0.967741935483871,
         "support": 32.0
       },
       "1": {
-        "precision": 0.9807692307692307,
-        "recall": 0.9622641509433962,
-        "f1-score": 0.9714285714285714,
+        "precision": 0.9636363636363636,
+        "recall": 1.0,
+        "f1-score": 0.9814814814814815,
         "support": 53.0
       },
-      "accuracy": 0.9647058823529412,
+      "accuracy": 0.9764705882352941,
       "macro avg": {
-        "precision": 0.9600815850815851,
-        "recall": 0.9655070754716981,
-        "f1-score": 0.9626373626373627,
+        "precision": 0.9818181818181818,
+        "recall": 0.96875,
+        "f1-score": 0.9746117084826762,
         "support": 85.0
       },
       "weighted avg": {
-        "precision": 0.9651926504867681,
-        "recall": 0.9647058823529412,
-        "f1-score": 0.9648093083387201,
+        "precision": 0.977326203208556,
+        "recall": 0.9764705882352941,
+        "f1-score": 0.9763089465176752,
         "support": 85.0
       }
     },
-    "latency_ms_per_sample": 0.0334
+    "latency_ms_per_sample": 0.0262
   },
   "test": {
-    "accuracy": 0.9069767441860465,
+    "accuracy": 0.8953488372093024,
     "report": {
       "0": {
-        "precision": 0.9285714285714286,
-        "recall": 0.8125,
-        "f1-score": 0.8666666666666667,
+        "precision": 0.9259259259259259,
+        "recall": 0.78125,
+        "f1-score": 0.847457627118644,
         "support": 32.0
       },
       "1": {
-        "precision": 0.896551724137931,
+        "precision": 0.8813559322033898,
         "recall": 0.9629629629629629,
-        "f1-score": 0.9285714285714286,
+        "f1-score": 0.9203539823008849,
         "support": 54.0
       },
-      "accuracy": 0.9069767441860465,
+      "accuracy": 0.8953488372093024,
       "macro avg": {
-        "precision": 0.9125615763546798,
-        "recall": 0.8877314814814814,
-        "f1-score": 0.8976190476190476,
+        "precision": 0.9036409290646579,
+        "recall": 0.8721064814814814,
+        "f1-score": 0.8839058047097645,
         "support": 86.0
       },
       "weighted avg": {
-        "precision": 0.9084660327643488,
-        "recall": 0.9069767441860465,
-        "f1-score": 0.9055370985603545,
+        "precision": 0.897940115914101,
+        "recall": 0.8953488372093024,
+        "f1-score": 0.8932297571167953,
         "support": 86.0
       }
     },
-    "latency_ms_per_sample": 0.0279
+    "latency_ms_per_sample": 0.0266
   }
 }

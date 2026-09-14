@@ -1,0 +1,53 @@
+{
+  "timestamp": "2026-09-13T23:59:28Z",
+  "target_url": "http://127.0.0.1:8000",
+  "total_tests": 6,
+  "passed_tests": 6,
+  "failed_tests": 0,
+  "tests": [
+    {
+      "test": "GET /model-info",
+      "status_code": 200,
+      "latency_ms": 8.89,
+      "passed": true
+    },
+    {
+      "test": "GET /results-summary",
+      "status_code": 200,
+      "latency_ms": 24.34,
+      "passed": true
+    },
+    {
+      "test": "POST /predict [Heart Healthy]",
+      "status_code": 200,
+      "latency_ms": 2289.64,
+      "prediction": "No Heart Disease",
+      "risk": "Low Risk",
+      "passed": true
+    },
+    {
+      "test": "POST /predict [Heart Diseased]",
+      "status_code": 200,
+      "latency_ms": 64.29,
+      "prediction": "Heart Disease Present",
+      "risk": "High Risk",
+      "passed": true
+    },
+    {
+      "test": "POST /predict [WDBC Triage]",
+      "status_code": 200,
+      "latency_ms": 101.77,
+      "prediction": "Malignant",
+      "risk": "High Risk",
+      "passed": true
+    },
+    {
+      "test": "POST /predict-image [Brain MRI]",
+      "status_code": 200,
+      "latency_ms": 604.92,
+      "prediction": "meningioma",
+      "confidence": 0.8616,
+      "passed": true
+    }
+  ]
+}

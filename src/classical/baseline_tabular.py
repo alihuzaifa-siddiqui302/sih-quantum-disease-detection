@@ -34,7 +34,8 @@ import joblib
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, make_scorer, fbeta_score
+from sklearn.model_selection import GridSearchCV, PredefinedSplit
 from sklearn.svm import SVC
 from xgboost import XGBClassifier
 
@@ -48,21 +49,23 @@ METRICS_DIR.mkdir(parents=True, exist_ok=True)
 
 
 # ─── Model registry ──────────────────────────────────────────────────────────
-def _make_models() -> dict:
+def _make_models_and_grids() -> dict:
     return {
-        "lr": LogisticRegression(
-            C=1.0, max_iter=1000, solver="lbfgs", random_state=42
+        "lr": (
+            LogisticRegression(max_iter=1000, solver="lbfgs", random_state=42),
+            {"C": [0.01, 0.1, 1.0, 10.0, 100.0]}
         ),
-        "svm_rbf": SVC(
-            C=10.0, kernel="rbf", gamma="scale", probability=True, random_state=42
+        "svm_rbf": (
+            SVC(kernel="rbf", probability=True, random_state=42),
+            {"C": [0.1, 1.0, 10.0, 50.0], "gamma": ["scale", "auto", 0.1, 0.01]}
         ),
-        "rf": RandomForestClassifier(
-            n_estimators=300, random_state=42, n_jobs=-1
+        "rf": (
+            RandomForestClassifier(random_state=42, n_jobs=-1),
+            {"n_estimators": [100, 300, 500], "max_depth": [None, 5, 10]}
         ),
-        "xgb": XGBClassifier(
-            n_estimators=300, max_depth=6, learning_rate=0.1,
-            use_label_encoder=False, eval_metric="mlogloss",
-            random_state=42, verbosity=0,
+        "xgb": (
+            XGBClassifier(use_label_encoder=False, eval_metric="mlogloss", random_state=42, verbosity=0),
+            {"n_estimators": [100, 300], "max_depth": [3, 6], "learning_rate": [0.01, 0.1, 0.2]}
         ),
     }
 
@@ -85,17 +88,38 @@ def train_baselines(dataset: str, model_keys: list[str] | None = None) -> dict[s
     print(f"  train={len(y_train)}  val={len(y_val)}  test={len(y_test)}")
     print(f"{'='*60}")
 
-    models_dict = _make_models()
+    models_dict = _make_models_and_grids()
     if model_keys:
         models_dict = {k: v for k, v in models_dict.items() if k in model_keys}
 
     all_results = {}
+    
+    # Create PredefinedSplit (train=-1, val=0)
+    X_train_val = np.vstack((X_train, X_val))
+    y_train_val = np.concatenate((y_train, y_val))
+    test_fold = np.concatenate((
+        np.full(len(X_train), -1),
+        np.zeros(len(X_val))
+    ))
+    ps = PredefinedSplit(test_fold)
+    f2_scorer = make_scorer(fbeta_score, beta=2, average="binary", zero_division=0)
 
-    for name, clf in models_dict.items():
+    for name, (base_clf, param_grid) in models_dict.items():
         print(f"\n  [{name.upper()}]")
         t0 = time.perf_counter()
-        clf.fit(X_train, y_train)
+        
+        search = GridSearchCV(
+            estimator=base_clf,
+            param_grid=param_grid,
+            scoring=f2_scorer,
+            cv=ps,
+            refit=True
+        )
+        search.fit(X_train_val, y_train_val)
+        
+        clf = search.best_estimator_
         fit_time = time.perf_counter() - t0
+        print(f"    Best params: {search.best_params_}")
 
         def _eval(X: np.ndarray, y: np.ndarray, split: str) -> dict:
             t1 = time.perf_counter()
@@ -114,6 +138,7 @@ def train_baselines(dataset: str, model_keys: list[str] | None = None) -> dict[s
             "model": name,
             "dataset": dataset,
             "fit_time_s": round(fit_time, 4),
+            "best_params": search.best_params_,
             "train": _eval(X_train, y_train, "train"),
             "val":   _eval(X_val,   y_val,   "val"),
             "test":  _eval(X_test,  y_test,  "test"),

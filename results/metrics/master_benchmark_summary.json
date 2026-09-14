@@ -1,0 +1,473 @@
+{
+  "project": "SIH26139",
+  "title": "Hybrid Quantum-Classical Disease Detection Benchmark Master Summary",
+  "datasets": {
+    "heart_disease": {
+      "type": "tabular",
+      "task": "binary_classification",
+      "target": "Heart Disease Presence (Class 1)",
+      "samples": {
+        "train": 212,
+        "val": 45,
+        "test": 46,
+        "features_raw": 13,
+        "pca_qubits": 6
+      },
+      "models": {
+        "qsvc_noiseless": {
+          "accuracy": 0.608696,
+          "precision": 0.652015,
+          "recall": 0.579048,
+          "specificity": 0.579048,
+          "f1": 0.537946,
+          "f2": 0.551032,
+          "roc_auc": null,
+          "pr_auc": null,
+          "mcc": 0.219239
+        },
+        "qsvc_noisy": {
+          "accuracy": 0.652174,
+          "precision": 0.6997,
+          "recall": 0.626667,
+          "specificity": 0.626667,
+          "f1": 0.604301,
+          "f2": 0.60788,
+          "roc_auc": null,
+          "pr_auc": null,
+          "mcc": 0.31809
+        },
+        "lr": {
+          "accuracy": 0.847826,
+          "precision": 0.850379,
+          "recall": 0.852381,
+          "specificity": 0.852381,
+          "f1": 0.847754,
+          "f2": 0.849651,
+          "roc_auc": 0.952381,
+          "pr_auc": 0.950124,
+          "mcc": 0.702757
+        },
+        "svm_rbf": {
+          "accuracy": 0.847826,
+          "precision": 0.846591,
+          "recall": 0.848571,
+          "specificity": 0.848571,
+          "f1": 0.847176,
+          "f2": 0.847915,
+          "roc_auc": 0.893333,
+          "pr_auc": 0.886403,
+          "mcc": 0.69516
+        },
+        "rf": {
+          "accuracy": 0.847826,
+          "precision": 0.846591,
+          "recall": 0.848571,
+          "specificity": 0.848571,
+          "f1": 0.847176,
+          "f2": 0.847915,
+          "roc_auc": 0.929524,
+          "pr_auc": 0.919224,
+          "mcc": 0.69516
+        },
+        "xgb": {
+          "accuracy": 0.847826,
+          "precision": 0.846591,
+          "recall": 0.848571,
+          "specificity": 0.848571,
+          "f1": 0.847176,
+          "f2": 0.847915,
+          "roc_auc": 0.909524,
+          "pr_auc": 0.892857,
+          "mcc": 0.69516
+        },
+        "mcnemar": {
+          "quantum_model": "qsvc_noiseless",
+          "classical_model": "lr",
+          "chi2": 4.7619,
+          "p_value": 0.029096,
+          "b": 5,
+          "c": 16,
+          "significant_at_05": true
+        }
+      },
+      "mcnemar": {
+        "quantum_model": "qsvc_noiseless",
+        "classical_model": "lr",
+        "chi2": 4.7619,
+        "p_value": 0.029096,
+        "b": 5,
+        "c": 16,
+        "significant_at_05": true
+      },
+      "efficiency": {
+        "noiseless": {
+          "kernel_compute_s": 2659.79,
+          "svm_fit_s": 0.0051,
+          "total_fit_s": 2659.79,
+          "inference_latency_ms": 0.023
+        },
+        "noisy": {
+          "kernel_compute_s": 20764.39,
+          "svm_fit_s": 0.0093,
+          "total_fit_s": 20764.4,
+          "inference_latency_ms": 0.032
+        },
+        "circuit_depth": 49,
+        "gate_count": 114,
+        "n_qubits": 6,
+        "n_quantum_params": 0,
+        "n_classical_params": "SVM dual (n_support_vectors)"
+      }
+    },
+    "breast_cancer_wdbc": {
+      "type": "tabular",
+      "task": "binary_classification",
+      "target": "Malignant (Class 1) vs Benign (Class 0)",
+      "samples": {
+        "train": 398,
+        "val": 85,
+        "test": 86,
+        "features_raw": 30,
+        "pca_qubits": 5
+      },
+      "models": {
+        "qsvc_noiseless": {
+          "accuracy": 0.627907,
+          "precision": 0.313953,
+          "recall": 0.5,
+          "specificity": 0.5,
+          "f1": 0.385714,
+          "f2": 0.44702,
+          "roc_auc": null,
+          "pr_auc": null,
+          "mcc": 0.0
+        },
+        "lr": {
+          "accuracy": 0.895349,
+          "precision": 0.903641,
+          "recall": 0.872106,
+          "specificity": 0.872106,
+          "f1": 0.883906,
+          "f2": 0.875953,
+          "roc_auc": 0.968171,
+          "pr_auc": 0.980912,
+          "mcc": 0.775106
+        },
+        "svm_rbf": {
+          "accuracy": 0.906977,
+          "precision": 0.912562,
+          "recall": 0.887731,
+          "specificity": 0.887731,
+          "f1": 0.897619,
+          "f2": 0.891119,
+          "roc_auc": 0.978009,
+          "pr_auc": 0.985908,
+          "mcc": 0.799908
+        },
+        "rf": {
+          "accuracy": 0.883721,
+          "precision": 0.886084,
+          "recall": 0.862847,
+          "specificity": 0.862847,
+          "f1": 0.872024,
+          "f2": 0.865969,
+          "roc_auc": 0.972801,
+          "pr_auc": 0.984869,
+          "mcc": 0.74857
+        },
+        "xgb": {
+          "accuracy": 0.895349,
+          "precision": 0.903641,
+          "recall": 0.872106,
+          "specificity": 0.872106,
+          "f1": 0.883906,
+          "f2": 0.875953,
+          "roc_auc": 0.963542,
+          "pr_auc": 0.975609,
+          "mcc": 0.775106
+        },
+        "mcnemar": {
+          "quantum_model": "qsvc_noiseless",
+          "classical_model": "svm_rbf",
+          "chi2": 18.8929,
+          "p_value": 1.4e-05,
+          "b": 2,
+          "c": 26,
+          "significant_at_05": true
+        }
+      },
+      "mcnemar": {
+        "quantum_model": "qsvc_noiseless",
+        "classical_model": "svm_rbf",
+        "chi2": 18.8929,
+        "p_value": 1.4e-05,
+        "b": 2,
+        "c": 26,
+        "significant_at_05": true
+      },
+      "efficiency": {
+        "noiseless": {
+          "kernel_compute_s": 4650.87,
+          "svm_fit_s": 0.0061,
+          "total_fit_s": 4650.88,
+          "inference_latency_ms": 0.011
+        },
+        "circuit_depth": 40,
+        "gate_count": 80,
+        "n_qubits": 5,
+        "n_quantum_params": 0,
+        "n_classical_params": "SVM dual (n_support_vectors)"
+      }
+    },
+    "brain_mri": {
+      "type": "imaging",
+      "task": "multi_class_classification_4way",
+      "classes": [
+        "glioma",
+        "meningioma",
+        "notumor",
+        "pituitary"
+      ],
+      "samples": {
+        "train": 5712,
+        "val": 1428,
+        "test": 1600,
+        "image_size": [
+          224,
+          224,
+          3
+        ]
+      },
+      "models": {
+        "qtl": {
+          "accuracy": 0.91,
+          "precision": 0.914257,
+          "recall": 0.91,
+          "specificity": 0.97,
+          "f1": 0.907897,
+          "f2": 0.908262,
+          "roc_auc": null,
+          "pr_auc": null,
+          "mcc": 0.882484
+        },
+        "classical_resnet18": {
+          "accuracy": 0.941875,
+          "precision": 0.944308,
+          "recall": 0.941875,
+          "specificity": 0.980625,
+          "f1": 0.940739,
+          "f2": 0.940905,
+          "roc_auc": null,
+          "pr_auc": null,
+          "mcc": 0.923939
+        },
+        "mcnemar": {
+          "quantum_model": "qtl",
+          "classical_model": "classical_resnet18",
+          "chi2": 38.4615,
+          "p_value": 0.0,
+          "b": 7,
+          "c": 58,
+          "significant_at_05": true
+        }
+      },
+      "mcnemar": {
+        "quantum_model": "qtl",
+        "classical_model": "classical_resnet18",
+        "chi2": 38.4615,
+        "p_value": 0.0,
+        "b": 7,
+        "c": 58,
+        "significant_at_05": true
+      },
+      "detailed_class_breakdown": {
+        "dataset": "brain_mri",
+        "class_names": [
+          "glioma",
+          "meningioma",
+          "notumor",
+          "pituitary"
+        ],
+        "qtl": {
+          "report": {
+            "glioma": {
+              "precision": 0.9584664536741214,
+              "recall": 0.75,
+              "f1-score": 0.8415147265077139,
+              "support": 400.0,
+              "f2": 0.7841
+            },
+            "meningioma": {
+              "precision": 0.8413793103448276,
+              "recall": 0.915,
+              "f1-score": 0.8766467065868263,
+              "support": 400.0,
+              "f2": 0.8993
+            },
+            "notumor": {
+              "precision": 0.8963963963963963,
+              "recall": 0.995,
+              "f1-score": 0.943127962085308,
+              "support": 400.0,
+              "f2": 0.9736
+            },
+            "pituitary": {
+              "precision": 0.9607843137254902,
+              "recall": 0.98,
+              "f1-score": 0.9702970297029703,
+              "support": 400.0,
+              "f2": 0.9761
+            },
+            "accuracy": 0.91,
+            "macro avg": {
+              "precision": 0.9142566185352089,
+              "recall": 0.91,
+              "f1-score": 0.9078966062207046,
+              "support": 1600.0
+            },
+            "weighted avg": {
+              "precision": 0.9142566185352089,
+              "recall": 0.91,
+              "f1-score": 0.9078966062207046,
+              "support": 1600.0
+            }
+          },
+          "confusion_matrix": [
+            [
+              300,
+              65,
+              30,
+              5
+            ],
+            [
+              9,
+              366,
+              14,
+              11
+            ],
+            [
+              0,
+              2,
+              398,
+              0
+            ],
+            [
+              4,
+              2,
+              2,
+              392
+            ]
+          ],
+          "accuracy": 0.91,
+          "macro_f2": 0.9083,
+          "weighted_f2": 0.9083,
+          "latency_ms_per_sample": 115.94,
+          "checkpoint": "models/checkpoints/qtl_best.pth"
+        },
+        "classical_resnet18": {
+          "report": {
+            "glioma": {
+              "precision": 0.9761194029850746,
+              "recall": 0.8175,
+              "f1-score": 0.889795918367347,
+              "support": 400.0,
+              "f2": 0.845
+            },
+            "meningioma": {
+              "precision": 0.8842592592592593,
+              "recall": 0.955,
+              "f1-score": 0.9182692307692307,
+              "support": 400.0,
+              "f2": 0.94
+            },
+            "notumor": {
+              "precision": 0.9389671361502347,
+              "recall": 1.0,
+              "f1-score": 0.9685230024213075,
+              "support": 400.0,
+              "f2": 0.9872
+            },
+            "pituitary": {
+              "precision": 0.9778869778869779,
+              "recall": 0.995,
+              "f1-score": 0.9863692688971499,
+              "support": 400.0,
+              "f2": 0.9915
+            },
+            "accuracy": 0.941875,
+            "macro avg": {
+              "precision": 0.9443081940703867,
+              "recall": 0.941875,
+              "f1-score": 0.9407393551137588,
+              "support": 1600.0
+            },
+            "weighted avg": {
+              "precision": 0.9443081940703867,
+              "recall": 0.941875,
+              "f1-score": 0.9407393551137588,
+              "support": 1600.0
+            }
+          },
+          "confusion_matrix": [
+            [
+              327,
+              48,
+              22,
+              3
+            ],
+            [
+              8,
+              382,
+              4,
+              6
+            ],
+            [
+              0,
+              0,
+              400,
+              0
+            ],
+            [
+              0,
+              2,
+              0,
+              398
+            ]
+          ],
+          "accuracy": 0.9419,
+          "macro_f2": 0.9409,
+          "weighted_f2": 0.9409,
+          "latency_ms_per_sample": 63.64,
+          "checkpoint": "models/checkpoints/classical_resnet_best.pth"
+        }
+      },
+      "efficiency": {
+        "model": "qtl",
+        "total_train_time_s": 26816.0,
+        "n_classes": 4,
+        "test_f2": 0.9083,
+        "circuit_metrics_error": "'CircuitSpecs' object has no attribute 'get'",
+        "inference_latency_ms": 80.05
+      }
+    }
+  },
+  "clinical_decision_thresholds": {
+    "heart_disease": {
+      "operating_threshold": 0.5,
+      "triage_mode": "balanced"
+    },
+    "breast_cancer_wdbc": {
+      "operating_threshold": 0.1,
+      "triage_mode": "high_sensitivity_screening",
+      "risk_tiers": {
+        "low": "<0.20",
+        "moderate": "0.20-0.70",
+        "high": ">=0.70"
+      }
+    },
+    "brain_mri": {
+      "operating_threshold": 0.25,
+      "argmax_multiclass": true
+    }
+  }
+}

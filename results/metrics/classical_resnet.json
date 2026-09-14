@@ -1,0 +1,49 @@
+{
+  "model": "classical_resnet18",
+  "dataset": "brain_mri",
+  "total_train_time_s": 27225.3,
+  "test": {
+    "accuracy": 0.941875,
+    "f2": 0.9409045869159939,
+    "latency_ms_per_sample": 63.639,
+    "report": {
+      "0": {
+        "precision": 0.9761194029850746,
+        "recall": 0.8175,
+        "f1-score": 0.889795918367347,
+        "support": 400.0
+      },
+      "1": {
+        "precision": 0.8842592592592593,
+        "recall": 0.955,
+        "f1-score": 0.9182692307692307,
+        "support": 400.0
+      },
+      "2": {
+        "precision": 0.9389671361502347,
+        "recall": 1.0,
+        "f1-score": 0.9685230024213075,
+        "support": 400.0
+      },
+      "3": {
+        "precision": 0.9778869778869779,
+        "recall": 0.995,
+        "f1-score": 0.9863692688971499,
+        "support": 400.0
+      },
+      "accuracy": 0.941875,
+      "macro avg": {
+        "precision": 0.9443081940703867,
+        "recall": 0.941875,
+        "f1-score": 0.9407393551137588,
+        "support": 1600.0
+      },
+      "weighted avg": {
+        "precision": 0.9443081940703867,
+        "recall": 0.941875,
+        "f1-score": 0.9407393551137588,
+        "support": 1600.0
+      }
+    }
+  }
+}

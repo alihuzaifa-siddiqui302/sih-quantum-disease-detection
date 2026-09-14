@@ -222,10 +222,13 @@ def build_qsvc(
         sampler = StatevectorSampler()
         label = "noiseless"
     else:
-        # Noisy: use AerSampler with noise model via set_options (qiskit-aer 0.17.x API)
-        from qiskit_aer.primitives import Sampler as AerSampler  # noqa: PLC0415
-        sampler = AerSampler()
-        sampler.set_options(noise_model=noise_model)
+        # Noisy: use AerSamplerV2 with noise model
+        from qiskit_aer.primitives import SamplerV2 as AerSamplerV2  # noqa: PLC0415
+        from qiskit import transpile  # noqa: PLC0415
+        # AerSamplerV2 requires standard gates; decompose BlueprintCircuit
+        feature_map = transpile(feature_map, basis_gates=['u1', 'u2', 'u3', 'cx', 'rx', 'ry', 'rz', 'id'])
+        sampler = AerSamplerV2()
+        sampler.options.simulator = {"noise_model": noise_model}
         label = "noisy"
 
     fidelity = ComputeUncompute(sampler=sampler)

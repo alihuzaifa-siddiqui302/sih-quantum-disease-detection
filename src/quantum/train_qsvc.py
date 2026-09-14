@@ -38,6 +38,7 @@ sys.path.insert(0, str(ROOT))
 
 PROCESSED_DIR  = ROOT / "data" / "processed"
 CHECKPOINT_DIR = ROOT / "models" / "checkpoints"
+CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 METRICS_DIR    = ROOT / "results" / "metrics"
 METRICS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -156,13 +157,32 @@ def _train_single(
     noise_model = build_noise_model() if mode == "noisy" else None
     qsvc, fm = build_qsvc(n_qubits=n_qubits, noise_model=noise_model, reps=reps)
 
-    # ── Step 1: compute kernel matrices (timed) ────────────────────────────
-    print(f"  Computing quantum kernel matrices...")
-    t_kernel_start = time.perf_counter()
-    K_train = qsvc.quantum_kernel.evaluate(X_train)            # (n_train, n_train)
-    K_val   = qsvc.quantum_kernel.evaluate(X_val, X_train)     # (n_val,   n_train)
-    K_test  = qsvc.quantum_kernel.evaluate(X_test, X_train)    # (n_test,  n_train)
-    kernel_compute_s = time.perf_counter() - t_kernel_start
+    # ── Step 1: compute or load kernel matrices (timed) ────────────────────
+    kernel_cache_file = CHECKPOINT_DIR / f"qsvc_{dataset}_{mode}_kernels.npz"
+    if kernel_cache_file.exists():
+        print(f"  [Cache hit] Loading precomputed quantum kernel matrices from {kernel_cache_file.name}...")
+        cached = np.load(kernel_cache_file)
+        K_train = cached["K_train"]
+        K_val   = cached["K_val"]
+        K_test  = cached["K_test"]
+        kernel_compute_s = float(cached.get("kernel_compute_s", 0.0))
+        print(f"  Loaded: K_train={K_train.shape}, K_val={K_val.shape}, K_test={K_test.shape} "
+              f"(compute time: {kernel_compute_s:.1f}s)")
+    else:
+        print(f"  Computing quantum kernel matrices...")
+        t_kernel_start = time.perf_counter()
+        K_train = qsvc.quantum_kernel.evaluate(X_train)            # (n_train, n_train)
+        K_val   = qsvc.quantum_kernel.evaluate(X_val, X_train)     # (n_val,   n_train)
+        K_test  = qsvc.quantum_kernel.evaluate(X_test, X_train)    # (n_test,  n_train)
+        kernel_compute_s = time.perf_counter() - t_kernel_start
+        np.savez_compressed(
+            kernel_cache_file,
+            K_train=K_train,
+            K_val=K_val,
+            K_test=K_test,
+            kernel_compute_s=np.array(kernel_compute_s),
+        )
+        print(f"  Cached kernel matrices to {kernel_cache_file.name}")
 
     # ── Kernel diagonal sanity check (standalone, before C sweep) ────────
     diag_dev = _check_kernel_diagonal(K_train)

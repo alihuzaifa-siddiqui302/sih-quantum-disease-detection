@@ -1,0 +1,161 @@
+{
+  "dataset": "brain_mri",
+  "class_names": [
+    "glioma",
+    "meningioma",
+    "notumor",
+    "pituitary"
+  ],
+  "qtl": {
+    "report": {
+      "glioma": {
+        "precision": 0.9584664536741214,
+        "recall": 0.75,
+        "f1-score": 0.8415147265077139,
+        "support": 400.0,
+        "f2": 0.7841
+      },
+      "meningioma": {
+        "precision": 0.8413793103448276,
+        "recall": 0.915,
+        "f1-score": 0.8766467065868263,
+        "support": 400.0,
+        "f2": 0.8993
+      },
+      "notumor": {
+        "precision": 0.8963963963963963,
+        "recall": 0.995,
+        "f1-score": 0.943127962085308,
+        "support": 400.0,
+        "f2": 0.9736
+      },
+      "pituitary": {
+        "precision": 0.9607843137254902,
+        "recall": 0.98,
+        "f1-score": 0.9702970297029703,
+        "support": 400.0,
+        "f2": 0.9761
+      },
+      "accuracy": 0.91,
+      "macro avg": {
+        "precision": 0.9142566185352089,
+        "recall": 0.91,
+        "f1-score": 0.9078966062207046,
+        "support": 1600.0
+      },
+      "weighted avg": {
+        "precision": 0.9142566185352089,
+        "recall": 0.91,
+        "f1-score": 0.9078966062207046,
+        "support": 1600.0
+      }
+    },
+    "confusion_matrix": [
+      [
+        300,
+        65,
+        30,
+        5
+      ],
+      [
+        9,
+        366,
+        14,
+        11
+      ],
+      [
+        0,
+        2,
+        398,
+        0
+      ],
+      [
+        4,
+        2,
+        2,
+        392
+      ]
+    ],
+    "accuracy": 0.91,
+    "macro_f2": 0.9083,
+    "weighted_f2": 0.9083,
+    "latency_ms_per_sample": 115.94,
+    "checkpoint": "models/checkpoints/qtl_best.pth"
+  },
+  "classical_resnet18": {
+    "report": {
+      "glioma": {
+        "precision": 0.9761194029850746,
+        "recall": 0.8175,
+        "f1-score": 0.889795918367347,
+        "support": 400.0,
+        "f2": 0.845
+      },
+      "meningioma": {
+        "precision": 0.8842592592592593,
+        "recall": 0.955,
+        "f1-score": 0.9182692307692307,
+        "support": 400.0,
+        "f2": 0.94
+      },
+      "notumor": {
+        "precision": 0.9389671361502347,
+        "recall": 1.0,
+        "f1-score": 0.9685230024213075,
+        "support": 400.0,
+        "f2": 0.9872
+      },
+      "pituitary": {
+        "precision": 0.9778869778869779,
+        "recall": 0.995,
+        "f1-score": 0.9863692688971499,
+        "support": 400.0,
+        "f2": 0.9915
+      },
+      "accuracy": 0.941875,
+      "macro avg": {
+        "precision": 0.9443081940703867,
+        "recall": 0.941875,
+        "f1-score": 0.9407393551137588,
+        "support": 1600.0
+      },
+      "weighted avg": {
+        "precision": 0.9443081940703867,
+        "recall": 0.941875,
+        "f1-score": 0.9407393551137588,
+        "support": 1600.0
+      }
+    },
+    "confusion_matrix": [
+      [
+        327,
+        48,
+        22,
+        3
+      ],
+      [
+        8,
+        382,
+        4,
+        6
+      ],
+      [
+        0,
+        0,
+        400,
+        0
+      ],
+      [
+        0,
+        2,
+        0,
+        398
+      ]
+    ],
+    "accuracy": 0.9419,
+    "macro_f2": 0.9409,
+    "weighted_f2": 0.9409,
+    "latency_ms_per_sample": 63.64,
+    "checkpoint": "models/checkpoints/classical_resnet_best.pth"
+  }
+}
