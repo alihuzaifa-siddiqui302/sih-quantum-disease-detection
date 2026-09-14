@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import requests
 import streamlit as st
@@ -291,13 +292,18 @@ with tabs[3]:
         st.subheader("Breast Cancer Cytopathology Screening (Operating Point $\tau=0.10$)")
         st.info("Operating at high-sensitivity screening threshold $\tau=0.10$ to minimize missed malignancies.")
         if st.button("Evaluate Representative Screening Sample", type="primary"):
-            npz_w = np.load(ROOT / "data" / "processed" / "wbcd_processed.npz")
-            sample_feats = npz_w["X_test"][0].tolist()
-            res = requests.post(f"{API_URL}/predict", json={"dataset": "wbcd", "features": sample_feats}, timeout=5)
-            if res.status_code == 200:
-                d = res.json()
-                st.metric("Cytopathology Triage Result", d["predicted_label"], f"p={d['posterior_probability']*100:.1f}%")
-                st.write(f"**Action Indicated:** {d['triage_action']}")
+            try:
+                npz_w = np.load(ROOT / "data" / "processed" / "wbcd_processed.npz")
+                sample_feats = npz_w["X_test"][0].tolist()
+                res = requests.post(f"{API_URL}/predict", json={"dataset": "wbcd", "features": sample_feats}, timeout=5)
+                if res.status_code == 200:
+                    d = res.json()
+                    st.metric("Cytopathology Triage Result", d["predicted_label"], f"p={d['posterior_probability']*100:.1f}%")
+                    st.write(f"**Action Indicated:** {d['triage_action']}")
+                else:
+                    st.error(f"API Error: {res.text}")
+            except Exception as e:
+                st.error(f"Error evaluating sample: {e}")
 
 
 # ─── TAB 5: System Verification & Audit ───────────────────────────────────────
