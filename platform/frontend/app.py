@@ -241,7 +241,7 @@ with tabs[3]:
                 init_vals = [55, 1, 1, 130, 240, 0, 1, 150, 0, 1.0, 1, 0, 2]
 
             age = st.slider("Age", 20, 90, int(init_vals[0]))
-            sex = st.selectbox("Sex", ["Female (0)", "Male (1)"], index=int(init_vals[1]))
+            sex = st.selectbox("Sex", ["0: Female", "1: Male"], index=int(init_vals[1]))
             cp = st.selectbox("Chest Pain Type", ["0: Typical Angina", "1: Atypical Angina", "2: Non-anginal", "3: Asymptomatic"], index=int(init_vals[2]))
             trestbps = st.slider("Resting BP (mm Hg)", 90, 200, int(init_vals[3]))
 
@@ -258,11 +258,21 @@ with tabs[3]:
             ca = st.slider("Major Vessels (0-3)", 0, 3, int(init_vals[11]))
             thal = st.selectbox("Thalassemia", ["1: Normal", "2: Fixed Defect", "3: Reversible Defect"], index=min(int(init_vals[12])-1, 2))
 
+        def _parse_val(val):
+            if isinstance(val, (int, float)):
+                return float(val)
+            s = str(val).strip()
+            if ":" in s:
+                return float(s.split(":")[0].strip())
+            import re
+            m = re.search(r"\d+", s)
+            return float(m.group()) if m else 0.0
+
         if st.button("Run Diagnostic Inference", type="primary"):
             features = [
-                float(age), float(sex[0]), float(cp[0]), float(trestbps), float(chol),
-                float(fbs[0]), float(restecg[0]), float(thalach), float(exang[0]),
-                float(oldpeak), float(slope[0]), float(ca), float(thal[0])
+                float(age), _parse_val(sex), _parse_val(cp), float(trestbps), float(chol),
+                _parse_val(fbs), _parse_val(restecg), float(thalach), _parse_val(exang),
+                float(oldpeak), _parse_val(slope), float(ca), _parse_val(thal)
             ]
             try:
                 res = requests.post(f"{API_URL}/predict", json={"dataset": "heart", "features": features}, timeout=5)
