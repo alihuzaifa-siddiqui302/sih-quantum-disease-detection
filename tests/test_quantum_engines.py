@@ -128,8 +128,19 @@ class TestQSVCEngine:
             "test_accuracy": float((preds == y_test).mean()),
         }
         out_path = METRICS_DIR / "qsvc_wbcd_noiseless.json"
-        with open(out_path, "w", encoding="utf-8") as f:
-            json.dump(result, f, indent=2)
+        # Only write lightweight stub if real full benchmark run is not already present
+        write_stub = True
+        if out_path.exists():
+            try:
+                with open(out_path, encoding="utf-8") as f:
+                    existing = json.load(f)
+                if existing.get("status") == "complete":
+                    write_stub = False
+            except Exception:
+                pass
+        if write_stub:
+            with open(out_path, "w", encoding="utf-8") as f:
+                json.dump(result, f, indent=2)
         assert out_path.exists()
         assert 0.0 <= result["test_accuracy"] <= 1.0
         print(f"\n  QSVC subset accuracy: {result['test_accuracy']:.3f}")
