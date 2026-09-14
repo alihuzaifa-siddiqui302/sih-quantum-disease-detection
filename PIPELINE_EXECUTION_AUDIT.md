@@ -42,7 +42,7 @@
 ## 3. Directory Tree of Saved Artifacts, Model Weights, Metrics & Figures
 
 ```text
-c:\Users\ADMIN\Desktop\sih-quantum\
+sih-quantum/
 ├── models\checkpoints\
 │   ├── classical_lr_heart.pkl               [Logistic Regression - Heart]
 │   ├── classical_lr_wbcd.pkl                [Logistic Regression - WDBC]

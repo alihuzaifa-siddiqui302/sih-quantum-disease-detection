@@ -37,6 +37,7 @@ import argparse
 import json
 import sys
 import time
+import random
 from pathlib import Path
 from typing import Optional
 
@@ -439,12 +440,20 @@ def main() -> None:
     parser.add_argument("--epochs1", type=int, default=10, help="Stage 1 epochs")
     parser.add_argument("--epochs2", type=int, default=20, help="Stage 2 epochs")
     parser.add_argument("--batch",   type=int, default=32)
+    parser.add_argument("--seed",    type=int, default=42, help="Random seed for deterministic reproducibility")
     parser.add_argument("--no-cache", action="store_true", help="Re-extract features even if cached")
     args = parser.parse_args()
 
+    # Seed all PRNGs for deterministic reproducibility
+    random.seed(args.seed)
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(args.seed)
+
     from src.preprocessing.image_pipeline import get_dataloaders
-    print("\n[QTL Train] Loading Brain MRI DataLoaders...")
-    loaders = get_dataloaders(batch_size=args.batch)
+    print(f"\n[QTL Train] Loading Brain MRI DataLoaders (seed={args.seed})...")
+    loaders = get_dataloaders(batch_size=args.batch, seed=args.seed)
 
     print("[QTL Train] Building QuantumTransferModel (backbone FROZEN)...")
     model = QuantumTransferModel(n_classes=4, freeze_backbone=True, pretrained=True)
